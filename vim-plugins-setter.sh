@@ -7,7 +7,6 @@ repositories=(
   "https://github.com/Yggdroot/indentLine.git"
   "https://github.com/tpope/vim-commentary.git"
   "https://github.com/iamcco/markdown-preview.nvim.git"
-  "https://github.com/ctrlpvim/ctrlp.vim.git"
   "https://github.com/preservim/nerdtree.git"
   "https://github.com/editorconfig/editorconfig-vim.git"
   "https://github.com/tpope/vim-surround.git"
