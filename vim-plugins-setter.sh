@@ -6,7 +6,6 @@ repositories=(
   "https://github.com/neoclide/coc.nvim.git"
   "https://github.com/Yggdroot/indentLine.git"
   "https://github.com/tpope/vim-commentary.git"
-  "https://github.com/iamcco/markdown-preview.nvim.git"
   "https://github.com/preservim/nerdtree.git"
   "https://github.com/editorconfig/editorconfig-vim.git"
   "https://github.com/tpope/vim-surround.git"
@@ -17,6 +16,8 @@ repositories=(
   "https://github.com/junegunn/fzf.git"
   "https://github.com/sheerun/vim-polyglot.git"
   "https://github.com/junegunn/fzf.vim.git"
+  "https://github.com/junegunn/fzf.vim.git"
+  "https://github.com/tpope/vim-abolish.git"
 )
 
 cd ~/.vim/pack/vendor/start/
