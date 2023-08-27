@@ -14,6 +14,8 @@ CapsLock::Esc
   Gui, Add, Text, , 04. NonGameMode
   Gui, Add, Text, , 05. EntertainMode
   Gui, Add, Text, , 06. MusicMode
+  Gui, Add, Text, , 07. HackingMode
+  Gui, Add, Text, , 08. NonHackingMode
 
   Gui, -SysMenu
   Gui, Show
@@ -35,6 +37,7 @@ GameMode:
   ValorantPowerSchemeGuid := "f15e6c06-cc0e-4f4b-876f-e71c9d63af1e"
   ; https://www.autohotkey.com/board/topic/101027-switching-power-plans-using-ahk/
   Run, % "powercfg -SETACTIVE " . ValorantPowerSchemeGuid
+
   Send, {LWin}
   Sleep, 1000
   Send, AMD Radeon Settings
@@ -51,6 +54,7 @@ Return
 NonGameMode:
   HpRecommendedPowerSchemeGuid := "48684d4a-8524-4093-8a63-ea7132b79c1c"
   Run, % "powercfg -SETACTIVE " . HpRecommendedPowerSchemeGuid
+
   Send, {LWin}
   Sleep, 1000
   Send, AMD Radeon Settings
@@ -68,6 +72,7 @@ EntertainMode:
   Run, explorer D:\entertain
   Sleep, 1000
   Send, {Space}
+
   For property in ComObjGet( "winmgmts:\\.\root\WMI" ).ExecQuery( "SELECT * FROM WmiMonitorBrightnessMethods" ) {
     property.WmiSetBrightness(1, 100)
   }
@@ -79,6 +84,44 @@ MusicMode:
   Send, open.spotify.com/search{Enter}
   Sleep, 5000
   Send, gi
+Return
+
+HackingMode:
+  For property in ComObjGet( "winmgmts:\\.\root\WMI" ).ExecQuery( "SELECT * FROM WmiMonitorBrightnessMethods" ) {
+    property.WmiSetBrightness(1, 0)
+  }
+
+  ; https://www.autohotkey.com/boards/viewtopic.php?t=60028
+  SoundSet, +1, , Mute
+
+  Send, {LWin}
+  Sleep, 1000
+  Send, lid
+  Sleep, 1000
+  Send, {Enter}
+  Sleep, 1000
+  Send, {Tab 3}{Up}{Tab 4}{Enter}
+  Sleep, 1000
+  WinClose, Power
+Return
+
+NonHackingMode:
+  For property in ComObjGet( "winmgmts:\\.\root\WMI" ).ExecQuery( "SELECT * FROM WmiMonitorBrightnessMethods" ) {
+    property.WmiSetBrightness(1, 30)
+  }
+
+  ; https://www.autohotkey.com/boards/viewtopic.php?t=60028
+  SoundSet, +1, , Mute
+
+  Send, {LWin}
+  Sleep, 1000
+  Send, lid
+  Sleep, 1000
+  Send, {Enter}
+  Sleep, 1000
+  Send, {Tab 3}{Down}{Tab 4}{Enter}
+  Sleep, 1000
+  WinClose, Power
 Return
 
 RunTask:
@@ -100,6 +143,12 @@ RunTask:
   }
   else if (TaskName = "06") {
     GoSub, MusicMode
+  }
+  else if (TaskName = "07") {
+    GoSub, HackingMode
+  }
+  else if (TaskName = "08") {
+    GoSub, NonHackingMode
   }
   Gui, destroy
 return
