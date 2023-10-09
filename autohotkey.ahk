@@ -50,6 +50,11 @@ GameMode:
   Send, {Space}
   Sleep, 1000
   WinClose, Radeon
+  WinClose, ahk_exe chrome.exe
+  WinClose, ahk_exe WindowsTerminal.exe
+  WinClose, ahk_class CabinetWClass
+  Sleep, 1000
+  Run, wsl --shutdown
 Return
 
 NonGameMode:
