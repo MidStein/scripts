@@ -30,6 +30,7 @@ ClickCenterRight:
   CoordMode, Mouse, Screen
   MouseMove, 2 * A_ScreenWidth/3, A_ScreenHeight/2
   Click
+  MouseMove, 0, A_ScreenHeight/2
 Return
 
 GameMode:
