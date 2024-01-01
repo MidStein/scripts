@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 
-dotfiles=$(ls -A ~/dotfiles)
+dotfiles=$(find "$HOME/dotfiles/" -maxdepth 1 -type f)
 for dotfile in $dotfiles; do
-  if [[ "$dotfile" != ".git" && "$dotfile" != ".gitignore" ]]; then
-    if [[ ! ($(uname -s) == MINGW64_NT* && "$dotfile" == ".profile") ]]; then
-      rm ~/"$dotfile"
-      ln -s ~/dotfiles/"$dotfile" ~/"$dotfile"
-    fi
-  fi
+  rm "$HOME/$(basename "$dotfile")"
+  ln -s "$dotfile" "$HOME/$(basename "$dotfile")"
 done
 
