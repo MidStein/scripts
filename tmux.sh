@@ -9,9 +9,9 @@ tmux new-session -d -s "$sessionName"
 
 tmux send-keys -t "$sessionName":0 "cd $path" C-m
 if [ -f "$path/Session.vim" ]; then
-  tmux send-keys -t "$sessionName":0 'vim -S' C-m
+  tmux send-keys -t "$sessionName":0 'nvim -S' C-m
 else
-  tmux send-keys -t "$sessionName":0 'vim .' C-m
+  tmux send-keys -t "$sessionName":0 'nvim .' C-m
 fi
 tmux split-window
 tmux resize-pane -t "$sessionName":0.1 -y 10%
