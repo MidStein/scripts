@@ -8,14 +8,14 @@ CapsLock::Esc
   Gui, Add, Edit, vTaskName
   Gui, Add, Button, gRunTask, RunTask
 
-  Gui, Add, Text, , 01. CursorLeft
-  Gui, Add, Text, , 02. ClickCenterRight
-  Gui, Add, Text, , 03. GameMode
-  Gui, Add, Text, , 04. NonGameMode
-  Gui, Add, Text, , 05. EntertainMode
-  Gui, Add, Text, , 06. MusicMode
-  Gui, Add, Text, , 07. HackingMode
-  Gui, Add, Text, , 08. NonHackingMode
+  Gui, Add, Text, , a. CursorLeft
+  Gui, Add, Text, , b. ClickCenterRight
+  Gui, Add, Text, , c. GameMode
+  Gui, Add, Text, , d. NonGameMode
+  Gui, Add, Text, , e. EntertainMode
+  Gui, Add, Text, , f. MusicMode
+  Gui, Add, Text, , g. HackingMode
+  Gui, Add, Text, , h. NonHackingMode
 
   Gui, -SysMenu
   Gui, Show
@@ -132,28 +132,28 @@ Return
 
 RunTask:
   GuiControlGet, TaskName
-  if (TaskName = "01") {
+  if (TaskName = "a") {
     GoSub, CursorLeft
   }
-  else if (TaskName = "02") {
+  else if (TaskName = "b") {
     GoSub, ClickCenterRight
   }
-  else if (TaskName = "03") {
+  else if (TaskName = "c") {
     GoSub, GameMode
   }
-  else if (TaskName = "04") {
+  else if (TaskName = "d") {
     GoSub, NonGameMode
   }
-  else if (TaskName = "05") {
+  else if (TaskName = "e") {
     GoSub, EntertainMode
   }
-  else if (TaskName = "06") {
+  else if (TaskName = "f") {
     GoSub, MusicMode
   }
-  else if (TaskName = "07") {
+  else if (TaskName = "g") {
     GoSub, HackingMode
   }
-  else if (TaskName = "08") {
+  else if (TaskName = "h") {
     GoSub, NonHackingMode
   }
   Gui, destroy
