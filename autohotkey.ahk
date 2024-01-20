@@ -11,11 +11,11 @@ CapsLock::Esc
   Gui, Add, Text, , a. CursorLeft
   Gui, Add, Text, , b. ClickCenterRight
   Gui, Add, Text, , c. GameMode
-  Gui, Add, Text, , d. NonGameMode
+  Gui, Add, Text, , d. GameModeOff
   Gui, Add, Text, , e. EntertainMode
   Gui, Add, Text, , f. MusicMode
   Gui, Add, Text, , g. HackingMode
-  Gui, Add, Text, , h. NonHackingMode
+  Gui, Add, Text, , h. HackingModeOff
 
   Gui, -SysMenu
   Gui, Show
@@ -57,7 +57,7 @@ GameMode:
   Run, wsl --shutdown
 Return
 
-NonGameMode:
+GameModeOff:
   HpRecommendedPowerSchemeGuid := "48684d4a-8524-4093-8a63-ea7132b79c1c"
   Run, % "powercfg -SETACTIVE " . HpRecommendedPowerSchemeGuid
 
@@ -111,7 +111,7 @@ HackingMode:
   WinClose, Power
 Return
 
-NonHackingMode:
+HackingModeOff:
   For property in ComObjGet( "winmgmts:\\.\root\WMI" ).ExecQuery( "SELECT * FROM WmiMonitorBrightnessMethods" ) {
     property.WmiSetBrightness(1, 30)
   }
@@ -142,7 +142,7 @@ RunTask:
     GoSub, GameMode
   }
   else if (TaskName = "d") {
-    GoSub, NonGameMode
+    GoSub, GameModeOff
   }
   else if (TaskName = "e") {
     GoSub, EntertainMode
@@ -154,7 +154,7 @@ RunTask:
     GoSub, HackingMode
   }
   else if (TaskName = "h") {
-    GoSub, NonHackingMode
+    GoSub, HackingModeOff
   }
   Gui, destroy
 return
