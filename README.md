@@ -1,16 +1,17 @@
 # Scripts
 
-Automation scripts and helper tools
+Automation scripts and helper tools.
 
 ---
 
 ### Files
 
 - [autohotkey.ahk](#autohotkeyahk)
-- [color-converter.py](#color-converterpy)
+- [color-converter\.py](#color-converterpy)
+- [directory-functions.bash](#directory-functionsbash)
 - [dotfiles-symlinker.bash](#dotfiles-symlinkerbash)
+- [rng\.py](#rngpy)
 - [tmux.bash](#tmuxbash)
-- [rng.py](#rngpy)
 
 ---
 
@@ -37,6 +38,7 @@ matplotlib libraries.
 
 ```python
 #!/usr/bin/env python3
+
 import sys
 from PIL import ImageColor
 from matplotlib import colors
@@ -52,6 +54,11 @@ elif len(sys.argv) - 1 == 3:
     print(colors.to_hex(rgb))
 ```
 
+## directory-functions\.bash
+
+An extension of [tmux.bash](#tmuxbash). This file stores custom functions based
+on the directory that was passed to tmux.bash.
+
 ## dotfiles-symlinker\.bash
 
 ```bash
@@ -60,46 +67,22 @@ $ # , or Oh, I just installed this new linux distro, what am I ever gonna do?
 $ git clone github.com/MidStein/dotfiles
 $ git checkout suitableBranch
 $ git clone github.com/MidStein/scripts
-$ ~/scripts/dotfiles-symlinker.bash
+$ ./scripts/dotfiles-symlinker.bash
 $
 ```
 
 ```bash
 #!/usr/bin/env bash
 
-dotfiles=$(find "$HOME/dotfiles/" -maxdepth 1 -type f)
-for dotfile in $dotfiles; do
-  if [[ "$(basename "$dotfile")" = "init.lua" ]]; then
-    rm "$HOME/.config/nvim/init.lua"
-    ln -s "$dotfile" "$HOME/.config/nvim/init.lua"
-    continue
-  fi
-  rm "$HOME/$(basename "$dotfile")"
-  ln -s "$dotfile" "$HOME/$(basename "$dotfile")"
+set -e
+shopt -s dotglob
+for file in "$HOME"/dotfiles/* ; do
+  [[ -f $file ]] && [[ $(basename "$file") != "init.lua" ]] && [[ $(basename \
+    "$file") != README.md ]] && ln -sf "$file" "$HOME/"
 done
+
+ln -sf "$HOME/dotfiles/init.lua" "$HOME/.config/nvim/"
 ```
-
-## tmux\.bash
-
-I have a well organized file system and I consider software project directories
-an office for work in the hypothetical file system building. So, when I have to
-do some kind of work, I go to the particular directory for it and run this
-script that sets up tmux in that directory as the base.
-
-No matter what the work, I keep the same layout of panes. Eg: First window has
-one main pane running NeoVim, there are three panes below it. One runs
-servers/compile commands. Another one I use to run project related commands that
-need to be run in the same directory like git and file management commands. The
-last one runs commands unrelated to the directory.
-
-According to the directory, this scripts runs a function that in turn runs some
-custom scripts. These functions that store custom scripts for each directory, I
-have put in [project-scripts.bash](#project-scriptsbash) described below.
-
-Since the layout stays the same, I also have custom bindings that move the pane
-in the exact position and size I want. So, if the pane running the server shows
-an error, with some simple key presses I can get that pane with the same size as
-my editor. This way I can focus on these two panes in particular.
 
 ## rng\.py
 
@@ -108,7 +91,7 @@ library that generates cryptographically secure pseudo-random numbers unlike
 python's random module.
 
 ```bash
-$ # Can't decide out of 50 books in the shelf, which library to pick
+$ # Can't decide out of 50 books in the shelf, which book to pick
 $ ./rng.py --max 50
 14
 
@@ -120,8 +103,8 @@ $ ./rng.py --min 100 --max 999
 713
 $ # avinash713 not taken. yay!
 
-$ # I want to generate my password using a wordlist which needs me to throw a
-$ # die 4 times. Problem is I do not have a die. Say no more.
+$ # You want to generate my password using a wordlist which needs me to throw a
+$ # die 4 times. Problem is you do not have a die. Say no more.
 $ rand=$(./rng.py --max 6 -c 4)
 3 4 2 4
 $ grep "$(echo "$rand" | tr -d ' ')" wordlist.txt | awk '{ print $2 }'
@@ -149,4 +132,26 @@ for _ in range(count):
 
 print()
 ```
+
+## tmux\.bash
+
+I have a well organized file system and I consider software project directories
+an *office* for work in the hypothetical file system *building*. So, when I
+have to do some kind of work, I go to the particular directory for it and run
+this script that sets up tmux in that directory as the base.
+
+No matter what the work, I keep the same layout of panes. Eg: First window has
+one main pane running NeoVim, there are three panes below it. One runs
+servers/compile commands. Another one I use to run project related commands that
+need to be run in the same directory like git and file management commands. The
+last one runs commands unrelated to the directory path.
+
+According to the directory, this scripts runs a function that in turn runs some
+custom scripts. These functions that store custom scripts for each directory, I
+have put in [directory-functions.bash](#directory-functionsbash).
+
+Since the layout stays the same, I also have custom bindings that move the pane
+in the exact position and size I want. So, if the pane running the server shows
+an error, with some simple key presses I can get that pane with the same size as
+my editor. This way I can focus on these two panes in particular.
 

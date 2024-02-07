@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import sys
 from PIL import ImageColor
 from matplotlib import colors
