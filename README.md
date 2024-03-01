@@ -31,6 +31,8 @@ mode on AMD Radeon settings. Close other applications.
 - EntertainMode. Open media folder. Maximize brightness.
 - MusicMode. Open Spotify on Chrome and put focus on search bar.
 
+https://github.com/MidStein/scripts/assets/78083747/cfd79951-6784-4541-bc20-a71e839efc5b
+
 ## color-converter\.py
 
 Tool to convert HEX to RGB color code and vice versa. Uses python's PIL and
