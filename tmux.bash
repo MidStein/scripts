@@ -33,7 +33,8 @@ if [[ ! "$1" ]]; then
 else
   # shellcheck source=/dev/null
   source "$HOME/scripts/directory-functions.bash"
-  "${path//\//_}"
+  pathFromHome=${path#"$HOME/"}
+  "${pathFromHome//\//_}"
 
   lastModifiedFile="$(basename "$(find "$path" -maxdepth 1 -path './.git' \
     -prune -o -printf '%T@ %p\n' | sort -n | tail -1 | awk '{ print $2 }')")"

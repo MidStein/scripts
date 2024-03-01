@@ -23,13 +23,13 @@ This script shows a small menu which has an input box and a list of tasks along
 with alphabets character before them. On entering an alphabet in the input, the
 associated task runs.
 
-- CursorLeft. Puts the mouse cursor on the left. I rarely use the mouse.
+- CursorLeft. Puts the mouse cursor on the left (because I rarely use the mouse).
 - ClickCenterRight. Useful for those websites that steal focus from scrolling
 area making keyboard navigation difficult
 - GameMode. Change Windows power mode to best performance. Turn on eSports
 mode on AMD Radeon settings. Close other applications.
 - EntertainMode. Open media folder. Maximize brightness.
-- MusicMode. Open spotify on chrome and put focus on search bar.
+- MusicMode. Open Spotify on Chrome and put focus on search bar.
 
 ## color-converter\.py
 
@@ -57,7 +57,7 @@ elif len(sys.argv) - 1 == 3:
 ## directory-functions\.bash
 
 An extension of [tmux.bash](#tmuxbash). This file stores custom functions based
-on the directory that was passed to tmux.bash.
+on the directory that has been passed to tmux.bash.
 
 ## dotfiles-symlinker\.bash
 
@@ -88,7 +88,7 @@ ln -sf "$HOME/dotfiles/init.lua" "$HOME/.config/nvim/"
 
 Tool to generate multiple random numbers in a range. Uses python's secrets
 library that generates cryptographically secure pseudo-random numbers unlike
-python's random module.
+the random module.
 
 ```bash
 $ # Can't decide out of 50 books in the shelf, which book to pick
@@ -103,8 +103,8 @@ $ ./rng.py --min 100 --max 999
 713
 $ # avinash713 not taken. yay!
 
-$ # You want to generate my password using a wordlist which needs me to throw a
-$ # die 4 times. Problem is you do not have a die. Say no more.
+$ # You want to generate your password using a wordlist which needs you to throw
+$ # a die 4 times. Problem is you do not have a die. Say no more.
 $ rand=$(./rng.py --max 6 -c 4)
 3 4 2 4
 $ grep "$(echo "$rand" | tr -d ' ')" wordlist.txt | awk '{ print $2 }'
