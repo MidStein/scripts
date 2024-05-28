@@ -20,12 +20,14 @@ fi
 
 tmux neww -d
 tmux splitw -d -l 5% -t 1.0
-tmux splitw -d -h -t 1.0
+tmux splitw -h -t 1.0
+tmux selectp -t 1.0
 tmux splitw -d -h -t 1.2
 
 tmux neww -c "$HOME" -d
 tmux splitw -c "$HOME" -d -l 5% -t 2.0
-tmux splitw -c "$HOME" -d -h -t 2.0
+tmux splitw -c "$HOME" -h -t 2.0
+tmux selectp -t 2.0
 tmux splitw -c "$HOME" -d -h -t 2.2
 
 if [[ ! "$1" ]]; then
