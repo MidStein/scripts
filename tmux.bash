@@ -50,14 +50,14 @@ fi
 tmux bind b switch-client -T firstWindowBindings
 
 tmux bind -T firstWindowBindings a 'joinp -h -s 0.1 -t 0.0'
-tmux bind -T firstWindowBindings b \
+tmux bind -T firstWindowBindings z \
   'selectl main-horizontal; resizep -t 0.0 -y 67%'
 
-tmux bind -T firstWindowBindings c 'joinp -h -s 0.2 -t 0.0'
-tmux bind -T firstWindowBindings d 'joinp -h -s 0.1 -t 0.2'
+tmux bind -T firstWindowBindings b 'joinp -h -s 0.2 -t 0.0'
+tmux bind -T firstWindowBindings y 'joinp -h -s 0.1 -t 0.2'
 
-tmux bind -T firstWindowBindings e 'joinp -h -s 0.3 -t 0.0'
-tmux bind -T firstWindowBindings f 'joinp -h -s 0.1 -t 0.3'
+tmux bind -T firstWindowBindings c 'joinp -h -s 0.3 -t 0.0'
+tmux bind -T firstWindowBindings x 'joinp -h -s 0.1 -t 0.3'
 
 tmux bind -T firstWindowBindings g 'killp -t 0.1; resizep -t 0.1 -x 50%'
 
