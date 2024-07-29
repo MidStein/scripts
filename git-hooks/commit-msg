@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+msgLen=$(($(head -n 1 $1 | wc -m) - 1))
+if [[ msgLen -gt 50 ]]; then
+  printf 'Commit message length %d characters. Too long.\n' "$msgLen"
+  exit 1
+fi

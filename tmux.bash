@@ -11,12 +11,7 @@ fi
 tmux new -d -x "$columns" -y "$(( lines - 1 ))" 2> /dev/null
 
 tmux splitw -d -l 33%
-if [[ ! "$1" ]]; then
-  tmux splitw -d -h -t 0.1
-else
-  tmux splitw -d -h -l 66% -t 0.1
-  tmux splitw -c "$HOME" -d -h -t 0.2
-fi
+tmux splitw -d -h -t 0.1
 
 tmux neww -d
 tmux splitw -d -l 5% -t 1.0
@@ -43,7 +38,7 @@ else
   if [[ $lastModifiedFile == 'Session.vim' ]]; then
     tmux send 'nvim -S' C-m
   else
-    tmux send 'nvim .' C-m
+    tmux send '[[ -f Session.vim ]] && rm Session.vim; nvim .' C-m
   fi
 fi
 
@@ -64,4 +59,3 @@ tmux bind -T firstWindowBindings g 'killp -t 0.1; resizep -t 0.1 -x 50%'
 tmux bind e 'swapp -t .3'
 
 tmux a
-
