@@ -31,7 +31,8 @@ else
   # shellcheck source=/dev/null
   source "$HOME/scripts/directory-functions.bash"
   pathFromHome=${path#"$HOME/"}
-  "${pathFromHome//\//_}"
+  functionName=${pathFromHome//\//_}
+  [[ $(type -t "$functionName") == function ]] && $functionName
 
   lastModifiedFile="$(basename "$(find "$path" -maxdepth 1 -path './.git' \
     -prune -o -printf '%T@ %p\n' | sort -n | tail -1 | awk '{ print $2 }')")"
