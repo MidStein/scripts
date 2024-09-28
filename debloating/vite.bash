@@ -12,4 +12,8 @@ sed -i '/reactLogo/d' src/App.jsx
 sed -i '/viteLogo/d' src/App.jsx
 sed -i '/App\.css/d' src/App.jsx
 
-npm i && npm i -D eslint-config-airbnb-base prettier
+npm i && npm i -D \
+  eslint-config-airbnb-base \
+  prettier \
+  eslint-config-prettier \
+  prop-types
