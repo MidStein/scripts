@@ -33,6 +33,7 @@ else
   pathFromHome=${path#"$HOME/"}
   functionName=${pathFromHome//\//_}
   [[ $(type -t "$functionName") == function ]] && $functionName
+  tmux set status-right "$(basename $path)"
 
   lastModifiedFile="$(basename "$(find "$path" -maxdepth 1 -path './.git' \
     -prune -o -printf '%T@ %p\n' | sort -n | tail -1 | awk '{ print $2 }')")"

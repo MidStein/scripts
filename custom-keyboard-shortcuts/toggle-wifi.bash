@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 if [[ $(nmcli radio wifi) == 'disabled' ]]; then
   nmcli radio wifi on
 else
