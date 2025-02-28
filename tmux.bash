@@ -10,7 +10,7 @@ else
 fi
 tmux new -d -x "$columns" -y "$(( lines - 1 ))" 2> /dev/null
 
-tmux splitw -d -l 33%
+tmux splitw -d -l 5%
 tmux splitw -d -h -t 0.1
 
 tmux neww -d

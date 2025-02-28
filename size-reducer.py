@@ -44,7 +44,7 @@ def determine_output_path(
     if output_path:
         return output_path.resolve()
     else:
-        output_dir = pathlib.Path(os.path.expanduser("~/tbd/resized"))
+        output_dir = pathlib.Path(os.path.expanduser("~/tbd/adapted"))
         output_dir.mkdir(parents=True, exist_ok=True)
         return output_dir / input_path.name
 
@@ -94,7 +94,7 @@ def reduce_image(
             )
             return
 
-    print("Unable to lower image filesize below target size.", file=sys.stderr)
+    print(f"Unable to lower image filesize below {human_readable_size(max_size)}", file=sys.stderr)
     sys.exit(1)
 
 

@@ -2,11 +2,12 @@ import argparse
 import secrets
 import sys
 
-parser = argparse.ArgumentParser()
+parser: argparse.ArgumentParser = argparse.ArgumentParser()
 parser.add_argument("-c", type=int, help="count of random outputs")
-args = parser.parse_args()
+args: argparse.Namespace = parser.parse_args()
 
-lines = sys.stdin.read().splitlines()
+lines: list[str] = sys.stdin.read().splitlines()
+count: int
 if args.c:
     count = args.c
 elif len(lines) < 5:
@@ -17,9 +18,9 @@ if count > len(lines):
     print(f"Range too small for generating {count} random numbers")
     exit()
 
-numbers = []
+numbers: list[int] = []
 while len(numbers) < count:
-    rand = secrets.randbelow(len(lines)) + 1
+    rand: int = secrets.randbelow(len(lines)) + 1
     if rand not in numbers:
         print(lines[rand - 1].strip())
         numbers.append(rand)
