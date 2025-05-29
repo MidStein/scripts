@@ -2,9 +2,12 @@
 
 set -e
 
-for file in "$HOME"/dotfiles/.*; do
-  [[ -f $file ]] && ln -sf "$(realpath "$file")" "$HOME/"
+for_home=(.bashrc .aliases.bash .inputrc .ipython)
+for_config=(curlrc alacritty git nvim sqlite3 tmux zathura)
+
+for file in "${for_home[@]}"; do
+  [[ -e $file ]] && ln -sf "$HOME/dotfiles/$file" "$HOME/"
 done
-for dir in "$HOME"/dotfiles/* ; do
-  [[ "$(basename $file)" != README.md ]] && ln -sf "$(realpath "$file")" "$HOME/.config"
+for file in "${for_config[@]}"; do
+  [[ -e $file ]] && ln -sf "$HOME/dotfiles/$file" "$HOME/.config"
 done

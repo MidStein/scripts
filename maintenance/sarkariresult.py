@@ -5,11 +5,14 @@ import json
 import requests
 import os
 import smtplib
+import sys
 
+from datetime import date, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from typing import Any
 
-from bs4 import BeautifulSoup, NavigableString, Tag
+from bs4 import BeautifulSoup, Tag
 
 
 EMAIL_SENDER_ADDRESS = "deepakchauhan19feb@gmail.com"
@@ -37,20 +40,20 @@ def fetch_job_elements() -> list[Tag]:
 
 
 def parse_tag(tag: Tag) -> Job:
-    anchorTag: Tag | NavigableString | None = tag.find("a")
+    anchorTag = tag.find("a")
     if not isinstance(anchorTag, Tag):
         raise Exception("unexpected!")
-    post = anchorTag.get_text(strip=True)
+    post: str = anchorTag.get_text(strip=True)
     link = anchorTag.get("href")
     if not isinstance(link, str):
         raise Exception("unexpected!")
     return Job(post=post, link=link)
 
 
-def extract_new_jobs(last_visited_job: str, fetched_jobs: list[Job]) -> list[Job]:
+def extract_new_jobs(last_visited_post: str, fetched_jobs: list[Job]) -> list[Job]:
     new_jobs: list[Job] = []
     for job in fetched_jobs:
-        if job.post == last_visited_job:
+        if job.post == last_visited_post:
             break
         new_jobs.append(job)
     return new_jobs
@@ -62,14 +65,23 @@ def parse_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def get_last_visited_job() -> str:
-    with open(f"{os.path.dirname(__file__)}/last_visited_sarkariresult.json") as last_visited_file:
-        return json.load(last_visited_file)
+def get_last_visited() -> tuple[str, str]:
+    with open(
+        f"{os.path.dirname(__file__)}/last_visited_sarkariresult.json"
+    ) as last_visited_file:
+        last_visited: Any = json.load(last_visited_file)
+        return last_visited["post"], last_visited["date"]
 
 
-def update_last_visited_job(last_visited_job: str) -> None:
-    with open(f"{os.path.dirname(__file__)}/last_visited_sarkariresult.json", "w") as last_visited_file:
-        json.dump(last_visited_job, last_visited_file)
+def update_last_visited(last_visited_post: str) -> None:
+    last_visited: dict[str, str] = {
+        "post": last_visited_post,
+        "date": str(date.today())
+    }
+    with open(
+        f"{os.path.dirname(__file__)}/last_visited_sarkariresult.json", "w"
+    ) as last_visited_file:
+        json.dump(last_visited, last_visited_file, indent=2)
 
 
 def prepare_email_body(new_jobs: list[Job]) -> str:
@@ -99,19 +111,25 @@ def send_email(
 
 
 def main() -> None:
-    last_visited_job: str = get_last_visited_job()
+    last_visited_post, last_visited_date = get_last_visited()
+
+    if (
+        last_visited_date == str(date.today())
+        or last_visited_date == str(date.today() - timedelta(days=1))
+    ):
+        print("Email has already been sent")
+        sys.exit()
 
     args: argparse.Namespace = parse_arguments()
 
     tags: list[Tag] = fetch_job_elements()
     jobs: list[Job] = [parse_tag(tag) for tag in tags]
-    new_jobs: list[Job] = extract_new_jobs(last_visited_job, jobs)
+    new_jobs: list[Job] = extract_new_jobs(last_visited_post, jobs)
 
-    # update `last_visited_job` if new jobs found
     if not new_jobs:
         print("No new jobs found from sarkariresult.com")
         return
-    update_last_visited_job(new_jobs[0].post)
+    update_last_visited(new_jobs[0].post)
 
     body: str = prepare_email_body(new_jobs)
 
@@ -120,7 +138,7 @@ def main() -> None:
     send_email(
         EMAIL_SENDER_ADDRESS, EMAIL_RECEIVER_ADDRESS, EMAIL_SUBJECT, body, smtp_password
     )
-    print("New email(s) sent by sarkariresult")
+    print("New email sent by sarkariresult")
 
 
 if __name__ == "__main__":

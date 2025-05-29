@@ -1,5 +1,5 @@
 import argparse
-import secrets
+import random
 import sys
 
 parser: argparse.ArgumentParser = argparse.ArgumentParser()
@@ -15,12 +15,8 @@ elif len(lines) < 5:
 else:
     count = 5
 if count > len(lines):
-    print(f"Range too small for generating {count} random numbers")
-    exit()
+    raise Exception(f"Range too small for generating {count} random numbers")
 
-numbers: list[int] = []
-while len(numbers) < count:
-    rand: int = secrets.randbelow(len(lines)) + 1
-    if rand not in numbers:
-        print(lines[rand - 1].strip())
-        numbers.append(rand)
+lines = [line.strip() for line in lines]
+for line in random.sample(lines, count):
+    print(line)

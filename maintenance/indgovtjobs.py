@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 
 import argparse
+from datetime import date, timedelta
 import json
 import os
+import sys
+from typing import Any
 import requests
 import smtplib
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from bs4 import BeautifulSoup, NavigableString, Tag
+from bs4 import BeautifulSoup, Tag
 
 
 EMAIL_SENDER_ADDRESS: str = "deepakchauhan19feb@gmail.com"
@@ -45,7 +48,7 @@ def fetch_job_elements(url: str) -> list[Tag]:
 def parse_tag(tag: Tag) -> Job:
     title: str = tag.contents[1].get_text().strip()
     company: str = tag.contents[5].get_text().strip()
-    anchorTag: Tag | NavigableString | None = tag.find("a")
+    anchorTag = tag.find("a")
     if not isinstance(anchorTag, Tag):
         raise Exception("unexpected!")
     link: str | list[str] | None = anchorTag.get("href")
@@ -69,14 +72,23 @@ def parse_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def get_last_visited_jobs() -> dict[str, str]:
-    with open(f"{os.path.dirname(__file__)}/last_visited_indgovtjobs.json") as last_visited_file:
-        return json.load(last_visited_file)
+def get_last_visited() -> tuple[dict[str, str], str]:
+    with open(
+        f"{os.path.dirname(__file__)}/last_visited_indgovtjobs.json"
+    ) as last_visited_file:
+        last_visited: Any = json.load(last_visited_file)
+        return last_visited["posts"], last_visited["date"]
 
 
-def update_last_visited_jobs(last_visited_jobs: dict[str, str]) -> None:
-    with open(f"{os.path.dirname(__file__)}/last_visited_indgovtjobs.json", "w") as last_visited_file:
-        json.dump(last_visited_jobs, last_visited_file, indent=2)
+def update_last_visited(last_visited_posts: dict[str, str]) -> None:
+    last_visited: dict[str, dict[str, str] | str] = {
+        "posts": last_visited_posts,
+        "date": str(date.today()),
+    }
+    with open(
+        f"{os.path.dirname(__file__)}/last_visited_indgovtjobs.json", "w"
+    ) as last_visited_file:
+        json.dump(last_visited, last_visited_file, indent=2)
 
 
 def prepare_email_body(new_jobs: dict[str, list[Job]]) -> str:
@@ -111,7 +123,14 @@ def send_email(
 
 
 def main() -> None:
-    last_visited_jobs: dict[str, str] = get_last_visited_jobs()
+    last_visited_posts, last_visited_date = get_last_visited()
+
+    if (
+        last_visited_date == str(date.today())
+        or last_visited_date == str(date.today() - timedelta(days=1))
+    ):
+        print("Email has already been sent")
+        sys.exit()
 
     args: argparse.Namespace = parse_arguments()
 
@@ -120,16 +139,16 @@ def main() -> None:
     for url in URLS.items():
         tags: list[Tag] = fetch_job_elements(url[1])
         jobs: list[Job] = [parse_tag(tag) for tag in tags]
-        new_jobs[url[0]] = extract_new_jobs(last_visited_jobs[url[0]], jobs)
+        new_jobs[url[0]] = extract_new_jobs(last_visited_posts[url[0]], jobs)
 
         if len(new_jobs[url[0]]) != 0:
             new_jobs_found = True
-            last_visited_jobs[url[0]] = new_jobs[url[0]][0].title
+            last_visited_posts[url[0]] = new_jobs[url[0]][0].title
 
     if not new_jobs_found:
         print("No new jobs found from indgovtjobs.in")
         return
-    update_last_visited_jobs(last_visited_jobs)
+    update_last_visited(last_visited_posts)
 
     body: str = prepare_email_body(new_jobs)
 

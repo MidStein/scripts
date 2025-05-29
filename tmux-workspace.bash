@@ -5,13 +5,18 @@ read -r lines columns < <(stty size)
 if [[ ! "$1" ]]; then
   cd "$HOME" || exit
 else
-  path="$(realpath "$1")"
-  cd "$path" || exit
+  if [[ -d "$1" ]]; then
+    path="$(realpath "$1")"
+  else
+    path=$(zoxide query "$1") || exit
+  fi
+  cd $path || exit
 fi
 tmux new -d -x "$columns" -y "$(( lines - 1 ))" 2> /dev/null
 
-tmux splitw -d -l 5%
+tmux splitw -d -l 33%
 tmux splitw -d -h -t 0.1
+tmux resizep -Z -t 0.0
 
 tmux neww -d
 tmux splitw -d -l 5% -t 1.0
@@ -55,8 +60,6 @@ tmux bind -T firstWindowBindings y 'joinp -h -s 0.1 -t 0.2'
 
 tmux bind -T firstWindowBindings c 'joinp -h -s 0.3 -t 0.0'
 tmux bind -T firstWindowBindings x 'joinp -h -s 0.1 -t 0.3'
-
-tmux bind -T firstWindowBindings g 'killp -t 0.1; resizep -t 0.1 -x 50%'
 
 tmux bind e 'swapp -t .3'
 
