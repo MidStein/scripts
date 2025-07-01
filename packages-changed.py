@@ -60,7 +60,10 @@ def main() -> None:
     differ: difflib.Differ = difflib.Differ()
     diff: Iterator[str] = differ.compare(previous_packages, current_packages)
     filtered_diff: list[str] = [line for line in diff if not line.startswith(" ")]
-    print("\n".join(filtered_diff))
+    if filtered_diff:
+        print("\n".join(filtered_diff))
+    else:
+        print("No packages changed.")
 
 
 if __name__ == "__main__":

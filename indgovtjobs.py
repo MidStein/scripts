@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 
-import argparse
-from datetime import date, timedelta
 import json
 import os
 import sys
-from typing import Any
 import requests
-import smtplib
+import subprocess
 
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+from datetime import date, timedelta
+from typing import Any
 
 from bs4 import BeautifulSoup, Tag
 
@@ -66,12 +63,6 @@ def extract_new_jobs(last_visited_job: str, fetched_jobs: list[Job]) -> list[Job
     return new_jobs
 
 
-def parse_arguments() -> argparse.Namespace:
-    parser: argparse.ArgumentParser = argparse.ArgumentParser()
-    parser.add_argument("-p", required=True, type=ascii, help="app password")
-    return parser.parse_args()
-
-
 def get_last_visited() -> tuple[dict[str, str], str]:
     with open(
         f"{os.path.dirname(__file__)}/last_visited_indgovtjobs.json"
@@ -93,46 +84,23 @@ def update_last_visited(last_visited_posts: dict[str, str]) -> None:
 
 def prepare_email_body(new_jobs: dict[str, list[Job]]) -> str:
     body: str = ""
-    for category in new_jobs.items():
+    for idx, category in enumerate(new_jobs.items()):
         if len(category[1]) != 0:
-            body += f"<h2>{category[0]}</h2>"
-            body += "<ul>"
+            body += "\n" if idx > 0 else ""
+            body += f"## {category[0]}\n\n"
             for job in category[1]:
-                body += f"<li><a href={job.link}>{job.title} in {job.company}</a></li>"
-            body += "</ul>"
+                body += f"- [{job.title}]({job.link})\n"
     return body
-
-
-def send_email(
-    sender_address: str,
-    receiver_address: str,
-    subject: str,
-    body: str,
-    smtp_password: str,
-) -> None:
-    msg: MIMEMultipart = MIMEMultipart()
-    msg["From"] = sender_address
-    msg["To"] = receiver_address
-    msg["Subject"] = subject
-    msg.attach(MIMEText(body, "html"))
-
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
-        server.starttls()
-        server.login(sender_address, smtp_password)
-        server.sendmail(sender_address, receiver_address, msg.as_string())
 
 
 def main() -> None:
     last_visited_posts, last_visited_date = get_last_visited()
 
-    if (
-        last_visited_date == str(date.today())
-        or last_visited_date == str(date.today() - timedelta(days=1))
+    if last_visited_date == str(date.today()) or last_visited_date == str(
+        date.today() - timedelta(days=1)
     ):
         print("Email has already been sent")
         sys.exit()
-
-    args: argparse.Namespace = parse_arguments()
 
     new_jobs: dict[str, list[Job]] = {}
     new_jobs_found: bool = False
@@ -150,14 +118,15 @@ def main() -> None:
         return
     update_last_visited(last_visited_posts)
 
+    subject: str = "New jobs in www.indgovtjobs.in/2015/10/Government-Jobs.html"
     body: str = prepare_email_body(new_jobs)
 
-    smtp_password: str = args.p.strip("'")
-
-    send_email(
-        EMAIL_SENDER_ADDRESS, EMAIL_RECEIVER_ADDRESS, EMAIL_SUBJECT, body, smtp_password
+    result: subprocess.CompletedProcess[str] = subprocess.run(
+        [os.path.expanduser("~/scripts/gmail/self.py"), "-s", subject, "-b", body],
+        capture_output=True,
+        text=True,
     )
-    print("New email sent by indgovtjobs")
+    print(result.stdout)
 
 
 if __name__ == "__main__":

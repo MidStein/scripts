@@ -1,3 +1,4 @@
 directory-functions.bash
-maintenance/last_visited_sarkariresult.json
-maintenance/last_visited_indgovtjobs.json
+last_visited_indgovtjobs.json
+gmail/credentials.json
+gmail/token.json
