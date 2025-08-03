@@ -113,7 +113,7 @@ def main():
             summary=args.s, description="" if not args.b else args.b, dateTime=time
         )
 
-        event_result: Any = (
+        event_result: dict = (
             service.events()
             .insert(calendarId="primary", body=event.to_dict())
             .execute()

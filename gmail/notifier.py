@@ -59,7 +59,7 @@ def main():
 
     creds: Credentials = get_credentials()
     service: Any = build("gmail", "v1", credentials=creds)
-    results: Any = (
+    results: dict = (
         service.users()
         .messages()
         .list(userId="me", labelIds=["INBOX", "UNREAD"])
@@ -70,7 +70,7 @@ def main():
         print("0 unread emails.")
         sys.exit()
 
-    messages: Any = results.get("messages", [])
+    messages: list[dict[str, str]] = results.get("messages", [])
     env: dict[str, str] = {
         "DISPLAY": ":0",
         "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1000/bus",
