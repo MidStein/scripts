@@ -16,7 +16,7 @@ def get_previous_packages() -> list[str]:
     package_lines: list[str] = []
     for line_number in count(3):
         if file_lines[line_number - 1].strip() == "":
-            package_lines = file_lines[2:line_number - 1]
+            package_lines = file_lines[2 : line_number - 1]
             break
     package_lines = [line.strip() for line in package_lines]
     package_lines = [line[2:] for line in package_lines]

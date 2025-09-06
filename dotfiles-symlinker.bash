@@ -3,7 +3,7 @@
 set -e
 
 for_home=(.bashrc .aliases.bash .inputrc)
-for_config=(curlrc alacritty git nvim sqlite3 tmux zathura systemd)
+for_config=(curlrc alacritty git nvim sqlite3 tmux zathura systemd pyright)
 
 for file in "${for_home[@]}"; do
   [[ -e $file ]] && ln -sf "$HOME/dotfiles/$file" "$HOME/"

@@ -6,7 +6,6 @@ import os.path
 import socket
 import sys
 
-import google.auth.external_account_authorized_user
 import psutil
 
 from dataclasses import dataclass
@@ -15,6 +14,7 @@ from email.mime.text import MIMEText
 from pathlib import Path
 from typing import Any
 
+from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -65,27 +65,28 @@ class Event:
 
 def get_credentials() -> Credentials:
     tokenFilePath: Path = Path(os.path.dirname(__file__), "token.json")
+
+    creds = None
     if os.path.exists(tokenFilePath):
-        creds: Credentials = Credentials.from_authorized_user_file(
-            tokenFilePath, SCOPES
+        creds = Credentials.from_authorized_user_file(tokenFilePath, SCOPES)
+
+    if creds and creds.expired and creds.refresh_token:
+        creds.refresh(Request())
+
+    if not creds or not creds.valid:
+        flow = InstalledAppFlow.from_client_secrets_file(
+            Path(os.path.dirname(__file__), "credentials.json"), SCOPES
         )
-        if not creds or not creds.valid:
-            flow: InstalledAppFlow = InstalledAppFlow.from_client_secrets_file(
-                Path(os.path.dirname(__file__), "credentials.json"), SCOPES
-            )
-            new_creds: (
-                Credentials | google.auth.external_account_authorized_user.Credentials
-            ) = flow.run_local_server(port=0)
-            if isinstance(new_creds, Credentials):
-                creds = new_creds
-            else:
-                raise Exception(
-                    "isinstance(creds, google.auth.external_account_authorized_user) should not be true"
-                )
-            with open(tokenFilePath, "w") as token:
-                token.write(creds.to_json())
+        creds = flow.run_local_server(port=0, access_type="offline")
+        with open(tokenFilePath, "w") as token:
+            token.write(creds.to_json())
+
+    if isinstance(creds, Credentials):
         return creds
-    raise Exception
+    else:
+        raise Exception(
+            "isinstance(creds, google.auth.external_account_authorized_user) should not be true"
+        )
 
 
 def create_message(subject, message_text):
@@ -109,6 +110,7 @@ def main():
         service: Any = build("calendar", "v3", credentials=creds)
 
         time: str = datetime.fromtimestamp(int(args.t), tz=timezone.utc).isoformat()
+
         event: Event = Event(
             summary=args.s, description="" if not args.b else args.b, dateTime=time
         )

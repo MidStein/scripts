@@ -71,13 +71,8 @@ def main():
         sys.exit()
 
     messages: list[dict[str, str]] = results.get("messages", [])
-    env: dict[str, str] = {
-        "DISPLAY": ":0",
-        "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1000/bus",
-    }
     subprocess.run(
         ["notify-send", "gmail-notifier", f"You have {len(messages)} unread email(s)."],
-        env=env,
     )
 
 

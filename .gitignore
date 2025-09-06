@@ -1,5 +1,7 @@
 directory-functions.bash
-last_visited_indgovtjobs.json
+last_visited_indgovtjobs.txt
 gmail/credentials.json
 gmail/token.json
+gmail/__pycache__/
 reminders.json
+.ruff_cache

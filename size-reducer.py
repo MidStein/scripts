@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import argparse
-import logging
 import mimetypes
 import pathlib
 import os
@@ -94,8 +93,6 @@ def reduce_image(
     for quality in range(95, 4, -5):
         img.save(output_path, format=format.upper(), quality=quality)
         size_reached = output_path.stat().st_size
-        logging.debug(f"{quality}")
-        logging.debug(f"{size_reached=}")
         if size_reached < max_size:
             output_size = human_readable_size(output_path.stat().st_size)
             print(
@@ -109,13 +106,6 @@ def reduce_image(
 
 
 def main() -> None:
-    logging.basicConfig(
-        filename=os.path.expanduser("~/tbd/debug.log"),
-        filemode="w",
-        level=logging.DEBUG,
-        format="%(lineno)d: %(message)s",
-    )
-
     args: argparse.Namespace = parse_args()
 
     input_path = args.i.resolve()

@@ -57,6 +57,7 @@ def main():
         .execute()
     )
 
+    cnt: int = 0
     for event in response.get("items", []):
         start = event.get("start", {}).get("dateTime") or event.get("start", {}).get(
             "date"
@@ -65,6 +66,9 @@ def main():
 
         if start == end:
             service.events().delete(calendarId="primary", eventId=event["id"]).execute()
+            cnt += 1
+
+    print(f"{cnt} reminders deleted")
 
 
 if __name__ == "__main__":

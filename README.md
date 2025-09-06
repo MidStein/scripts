@@ -4,156 +4,123 @@ Automation scripts and helper tools.
 
 ---
 
-### Files
+### Items
 
-- [autohotkey.ahk](#autohotkeyahk)
-- [color-converter\.py](#color-converterpy)
-- [directory-functions.bash](#directory-functionsbash)
+- [check-battery.py](#check-batterypy)
+- [commit-msg](#commit-msg)
 - [dotfiles-symlinker.bash](#dotfiles-symlinkerbash)
-- [rng\.py](#rngpy)
-- [tmux.bash](#tmuxbash)
+- [gmail](#gmail)
+- [indgovtjobs.py](#indgovtjobspy)
+- [packages-changed.py](#packages-changedpy)
+- [rand.py](#randpy)
+- [reminders.py](#reminderspy)
+- [size-reducer.py](#size-reducerpy)
+- [tmux-workspace.bash](#tmux-workspacebash)
+- [toggle-wifi.bash](#toggle-wifibash)
 
 ---
 
-## autohotkey\.ahk
+## check-battery.py
 
-An autohotkey script for Windows. The day anti cheat software start working
-properly on Linux, will be the day when this script gets deleted.
-This script shows a small menu which has an input box and a list of tasks along
-with alphabets character before them. On entering an alphabet in the input, the
-associated task runs.
+Check if battery percentage is 100 and if so, send a desktop notification.
 
-- CursorLeft. Puts the mouse cursor on the left (because I rarely use the mouse).
-- ClickCenterRight. Useful for those websites that steal focus from scrolling
-area making keyboard navigation difficult
-- GameMode. Change Windows power mode to best performance. Turn on eSports
-mode on AMD Radeon settings. Close other applications.
-- EntertainMode. Open media folder. Maximize brightness.
-- MusicMode. Open Spotify on Chrome and put focus on search bar.
+## commit-msg
 
-https://github.com/MidStein/scripts/assets/78083747/cfd79951-6784-4541-bc20-a71e839efc5b
+This hook fails a `git commit` if commit subject is greater than 50 characters.
 
-## color-converter\.py
+## dotfiles-symlinker.bash
 
-Tool to convert HEX to RGB color code and vice versa. Uses python's PIL and
-matplotlib libraries.
+Create symlinks for various dotfiles from ~/dotfiles to the paths where they
+get read from associated software.
 
-```python
-#!/usr/bin/env python3
+## gmail
 
-import sys
-from PIL import ImageColor
-from matplotlib import colors
+These scripts use Google APIs that interact with Gmail and Calendar. They use
+OAuth2 to authenticate with Google.
 
-if len(sys.argv) - 1 == 1:
-    hex = sys.argv[1]
-    print(ImageColor.getcolor(hex, 'RGB'))
-elif len(sys.argv) - 1 == 3:
-    r = int(sys.argv[1]) / 255
-    g = int(sys.argv[2]) / 255
-    b = int(sys.argv[3]) / 255
-    rgb = (r, g, b)
-    print(colors.to_hex(rgb))
-```
+Requirements:
 
-## directory-functions\.bash
+- [psutil](https://github.com/giampaolo/psutil)
+- [Google API Client](https://github.com/googleapis/google-api-python-client/)
+- [Google Auth Python
+  Library](https://github.com/googleapis/google-auth-library-python)
+- [google-auth-library-python-oauthlib](https://github.com/googleapis/google-auth-library-python-oauthlib)
 
-An extension of [tmux.bash](#tmuxbash). This file stores custom functions based
-on the directory that has been passed to tmux.bash.
+### notifier.py
 
-## dotfiles-symlinker\.bash
+Shows a desktop notification if there is an unread email in the Gmail inbox.
 
-```bash
-$ # Whoops, ran find -type f -maxdepth 1 -delete on the wrong directory ($HOME)
-$ # , or Oh, I just installed this new linux distro, what am I ever gonna do?
-$ git clone github.com/MidStein/dotfiles
-$ git checkout suitableBranch
-$ git clone github.com/MidStein/scripts
-$ ./scripts/dotfiles-symlinker.bash
-$
-```
+### self.py
 
-```bash
-#!/usr/bin/env bash
+Sends me a gmail. This gets used by reminders.py and indgovtjobs.py. While
+there is no Gmail API to schedule emails, I use a Calendar hack to get
+scheduled gmails in this script. I create a calendar event for a particular
+time and set notifying me at the time of the event by gmail. The gmail ends up
+showing the title and description of the event.
 
-set -e
-shopt -s dotglob
-for file in "$HOME"/dotfiles/* ; do
-  [[ -f $file ]] && [[ $(basename "$file") != "init.lua" ]] && [[ $(basename \
-    "$file") != README.md ]] && ln -sf "$file" "$HOME/"
-done
+### delete-reminders.py
 
-ln -sf "$HOME/dotfiles/init.lua" "$HOME/.config/nvim/"
-```
+Delete Google Calendar events created by reminders.py, so that the calendar
+stays clean.
 
-## rng\.py
+## indgovtjobs.py
 
-Tool to generate multiple random numbers in a range. Uses python's secrets
-library that generates cryptographically secure pseudo-random numbers unlike
-the random module.
+Emails me all new IT fresher jobs by indgovtjobs.in. It uses gmail/self.py to
+send me a gmail.
 
-```bash
-$ # Can't decide out of 50 books in the shelf, which book to pick
-$ ./rng.py --max 50
-14
+Requires [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/)
 
-$ # avinash <CR> name already taken
-$ # avinash56 <CR> name already taken
-$ # avinash39 <CR> name already taken
-$ # why are there so many avinash?! all two digits numbers are also taken
-$ ./rng.py --min 100 --max 999
-713
-$ # avinash713 not taken. yay!
+## packages-changed.py
 
-$ # You want to generate your password using a wordlist which needs you to throw
-$ # a die 4 times. Problem is you do not have a die. Say no more.
-$ rand=$(./rng.py --max 6 -c 4)
-3 4 2 4
-$ grep "$(echo "$rand" | tr -d ' ')" wordlist.txt | awk '{ print $2 }'
-success
-```
+Gives a diff of which packages have I installed and removed from the last time.
 
-```python
-#!/usr/bin/env python3
+In another file, I maintain a list of packages that I have installed which are
+not dependencies of other packages and another list of which packages I have
+uninstalled. If I were to install archlinux elsewhere, I would refer back to
+that file.
 
-import secrets
-import argparse
+## rand.py
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--min", type=int)
-parser.add_argument("--max", type=int)
-parser.add_argument("-c", type=int,
-                    help="count of random numbers")
-args = parser.parse_args()
+Pick random lines from stdin. Useful with `seq` to generate random numbers that
+fall in a range. It gives 5 outputs by default, in case I don't like one
+output, I try the next.
 
-min = args.min if args.min else 1
-count = args.c if args.c else 1
+## reminders.py
 
-for _ in range(count):
-    print(secrets.randbelow(args.max - min + 1) + min, end=' ')
+Sets up reminders for a particular day by scheduling Gmail notifications. This
+uses gmail/self.py.
 
-print()
-```
+Requires [Pydantic](https://docs.pydantic.dev/latest/)
 
-## tmux\.bash
+## size-reducer.py
 
-I have a well organized file system and I consider software project directories
-an *office* for work in the hypothetical file system *building*. So, when I
-have to do some kind of work, I go to the particular directory for it and run
-this script that sets up tmux in that directory as the base.
+Reduces size of JPEG, PNG and PDF files to lower than a passed size.
 
-No matter what the work, I keep the same layout of panes. Eg: First window has
-one main pane running NeoVim, there are three panes below it. One runs
-servers/compile commands. Another one I use to run project related commands that
-need to be run in the same directory like git and file management commands. The
-last one runs commands unrelated to the directory path.
+Uses Pillow library to reduce image files. It tries to reduce image quality 5%
+at a time till the file size becomes lower than that passed. Reducing PDF sizes
+with Ghostscript works occasionally. Ghostscript only provides `ebook` and
+`screen` settings to reduce file size. I use this script to comply with various
+application registration websites that restrict file upload to a specific size.
 
-According to the directory, this scripts runs a function that in turn runs some
-custom scripts. These functions that store custom scripts for each directory, I
-have put in [directory-functions.bash](#directory-functionsbash).
+Requires [Pillow](https://pillow.readthedocs.io/en/stable/) and
+[Ghostscript](https://www.ghostscript.com/)
 
-Since the layout stays the same, I also have custom bindings that move the pane
-in the exact position and size I want. So, if the pane running the server shows
-an error, with some simple key presses I can get that pane with the same size as
-my editor. This way I can focus on these two panes in particular.
+## tmux-workspace.bash
 
+Sets up a tmux session according to my preferred way of working.
+
+I open one session for each project, which in turn is based on one directory
+path. It starts three windows. The first one has nvim running. The second and
+third window have 4 panes, with two panes maximized to work in and the other
+two as substitutes. The third window is always open with panes opened at home
+directory. This means, I run all project specific commands in the second window
+and non project specific commands in the third window.
+
+Project specific setup commands are saved in a different file which this script
+loads. It also sets the project name at the right of the status line. This
+script also loads the last saved nvim session to get me back to where I left
+nvim for example during the last day.
+
+## toggle-wifi.bash
+
+Toggle Wi-Fi on/off.

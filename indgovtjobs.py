@@ -1,25 +1,13 @@
 #!/usr/bin/env python
 
-import json
 import os
-import sys
 import requests
 import subprocess
-
-from datetime import date, timedelta
-from typing import Any
 
 from bs4 import BeautifulSoup, Tag
 
 
-EMAIL_SENDER_ADDRESS: str = "deepakchauhan19feb@gmail.com"
-EMAIL_RECEIVER_ADDRESS: str = "deepakchauhan19feb@gmail.com"
-EMAIL_SUBJECT: str = "New jobs in www.indgovtjobs.in/2015/10/Government-Jobs.html"
-URLS: dict[str, str] = {
-    "B.Tech Engineer Govt Jobs": "https://www.indgovtjobs.in/2013/09/government-jobs-for-engineers-2013-2014.html",
-    "Degree Graduate Govt Jobs": "https://www.indgovtjobs.in/2013/09/government-jobs-for-graduates-2013-2014.html",
-    "IT Engineer Jobs": "https://www.indgovtjobs.in/2014/04/it-fresher-jobs.html",
-}
+URL: str = "https://www.indgovtjobs.in/2014/04/it-fresher-jobs.html"
 
 
 class Job:
@@ -63,62 +51,46 @@ def extract_new_jobs(last_visited_job: str, fetched_jobs: list[Job]) -> list[Job
     return new_jobs
 
 
-def get_last_visited() -> tuple[dict[str, str], str]:
+def get_last_visited() -> str:
     with open(
-        f"{os.path.dirname(__file__)}/last_visited_indgovtjobs.json"
+        f"{os.path.dirname(__file__)}/last_visited_indgovtjobs.txt"
     ) as last_visited_file:
-        last_visited: Any = json.load(last_visited_file)
-        return last_visited["posts"], last_visited["date"]
+        return last_visited_file.read().strip()
 
 
-def update_last_visited(last_visited_posts: dict[str, str]) -> None:
-    last_visited: dict[str, dict[str, str] | str] = {
-        "posts": last_visited_posts,
-        "date": str(date.today()),
-    }
+def update_last_visited(last_visited_post: str) -> None:
     with open(
-        f"{os.path.dirname(__file__)}/last_visited_indgovtjobs.json", "w"
+        f"{os.path.dirname(__file__)}/last_visited_indgovtjobs.txt", "w"
     ) as last_visited_file:
-        json.dump(last_visited, last_visited_file, indent=2)
+        last_visited_file.write(last_visited_post)
 
 
-def prepare_email_body(new_jobs: dict[str, list[Job]]) -> str:
+def prepare_email_body(jobs: list[Job]) -> str:
     body: str = ""
-    for idx, category in enumerate(new_jobs.items()):
-        if len(category[1]) != 0:
-            body += "\n" if idx > 0 else ""
-            body += f"## {category[0]}\n\n"
-            for job in category[1]:
-                body += f"- [{job.title}]({job.link})\n"
+    for job in jobs:
+        body += f"- [{job.title}]({job.link})\n"
     return body
 
 
 def main() -> None:
-    last_visited_posts, last_visited_date = get_last_visited()
+    last_visited = get_last_visited()
 
-    if last_visited_date == str(date.today()) or last_visited_date == str(
-        date.today() - timedelta(days=1)
-    ):
-        print("Email has already been sent")
-        sys.exit()
-
-    new_jobs: dict[str, list[Job]] = {}
+    new_jobs: list[Job] = []
     new_jobs_found: bool = False
-    for url in URLS.items():
-        tags: list[Tag] = fetch_job_elements(url[1])
-        jobs: list[Job] = [parse_tag(tag) for tag in tags]
-        new_jobs[url[0]] = extract_new_jobs(last_visited_posts[url[0]], jobs)
+    tags: list[Tag] = fetch_job_elements(URL)
+    jobs: list[Job] = [parse_tag(tag) for tag in tags]
+    new_jobs = extract_new_jobs(last_visited, jobs)
 
-        if len(new_jobs[url[0]]) != 0:
-            new_jobs_found = True
-            last_visited_posts[url[0]] = new_jobs[url[0]][0].title
+    if len(new_jobs) != 0:
+        new_jobs_found = True
+        last_visited = new_jobs[0].title
 
     if not new_jobs_found:
         print("No new jobs found from indgovtjobs.in")
         return
-    update_last_visited(last_visited_posts)
+    update_last_visited(last_visited)
 
-    subject: str = "New jobs in www.indgovtjobs.in/2015/10/Government-Jobs.html"
+    subject: str = "New IT Engineer Jobs at www.indgovtjobs.in"
     body: str = prepare_email_body(new_jobs)
 
     result: subprocess.CompletedProcess[str] = subprocess.run(

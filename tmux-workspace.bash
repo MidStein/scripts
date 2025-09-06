@@ -36,11 +36,11 @@ tmux splitw -c "$HOME" -d -h -t 2.2
 if [[ ! "$1" ]]; then
   tmux send 'nvim' C-m
 else
-  # shellcheck source=/dev/null
   source "$HOME/scripts/directory-functions.bash"
   pathFromHome=${path#"$HOME/"}
   functionName=${pathFromHome//\//_}
   [[ $(type -t "$functionName") == function ]] && $functionName
+
   tmux set status-right "$(basename $path)"
 
   lastModifiedFile="$(basename "$(find "$path" -maxdepth 1 -path './.git' \
@@ -53,5 +53,10 @@ else
 fi
 
 tmux bind e 'swapp -t .3'
+
+tmux bind v switch-client -T verticalResizing
+tmux bind -T verticalResizing 1 'resizep -y 50%'
+tmux bind -T verticalResizing 2 'resizep -y 67%'
+tmux bind -T verticalResizing 3 'resizep -y 95%'
 
 tmux a
